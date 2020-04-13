@@ -1,5 +1,6 @@
-#### DEFINING THE FIVE GROWTH MODELS & THEIR FUNCTIONS FOR OPTIM() ####
-# must run entire code before unif.growth.R
+#### Defining the five von Bertalannfy growth model parameterisations ####
+## to be used by the general purpose optimisation function optim()
+# must run entire script before running unif.growth.R
 
 # 1: EXPONENTIAL
 predict.Aeq1<- function(k, m0, the.data){
@@ -26,7 +27,6 @@ m0.start<- function(the.data){
   return(m0)
 }
 
-#####################
 # A wrapper so that optim can be used to fit the same models
 sumsq.optim<- function(par, the.data, predict.fun, m0=NULL, log=F){
   # 
@@ -101,7 +101,7 @@ b.start<- function(I.start, m0){
   return(log(I.start/m0))
 }
 
-# 3: A<1
+# 3: GENERALISED-VBGF
 predict.Alt1.third<- function(A, f, k, m0, the.data){
   # Calculate the predictions for the Gompertz model
   individuals<- unique(the.data$individual)
@@ -156,7 +156,7 @@ pred.optim.Alt1.third.nls<- function(par, the.data, m0){
   }
   return(predict.Alt1.third.nls(A.t, f.t, k.t, m0, the.data))
 }
-# 4: A=2/3
+# 4: PURE ISOMORPHY
 
 pred.optim.A23.third.nls<- function(par, the.data, m0){
   
@@ -174,7 +174,7 @@ pred.optim.A23.third.nls<- function(par, the.data, m0){
 }
 
 
-# 5: A>1
+# 5: SUPRA-EXPONENTIAL 
 predict.Agt1<- function(A, Z, K, m0, the.data){
   # Calculate the predictions for the Gompertz model
   individuals<- unique(the.data$individual)
@@ -187,7 +187,7 @@ predict.Agt1<- function(A, Z, K, m0, the.data){
     kk<- exp(K[i]*(A-1)*(subset-subset[1]))
     prediction<- c(prediction, m0[i]*((1-ff*kk)/(Z[i]))^(-1/(A-1)))
   }  
-  #print(prediction)
+  
   return(prediction)
 }
 predict.Agt1.nls<- function(alpha.t, Z.t, s.t, m0, the.data){
@@ -210,7 +210,7 @@ predict.Agt1.nls<- function(alpha.t, Z.t, s.t, m0, the.data){
   }  
   tstar.t0<- -log(1-new.params$Z)/(A-1)
   K<- new.params$s*tstar.t0/(tmax-t0)
-  #print(list(A, new.params$Z, K, new.params$s))
+  
   
   return(predict.Agt1(A, new.params$Z, K, m0, the.data))
 }
@@ -279,3 +279,4 @@ pred.optim.Agt1.nls<- function(par, the.data, m0){
   return(predict.Agt1.nls(alpha.t, Z.t, s.t, m0, the.data))
 }
 
+#### END ####
