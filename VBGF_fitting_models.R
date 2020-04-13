@@ -1,10 +1,9 @@
-# code for an 'all-in-one' function that runs all five VBGF-based models by looping over
-# all individuals of a single species and saves data as list for each model
-# This uses log least squares method of estimation 
+### Code for fitting the five VBGF parameterisations to growth data
+
 
 ##### FUNCTION FOR LOOPING THE 5 MODELS OVER INDIVIDUALS IN A SPECIES ####
-# USING LOG LEAST SQUARES ONLY 
-# SAVES M0 FIT ESTIMATES ONLY
+## to fit for a single species with one or more individual(s)
+# this uses log least squares method of estimation 
 
 unif.growth.mod<-function(the.data){ 
   # index the data
@@ -23,13 +22,11 @@ unif.growth.mod<-function(the.data){
   sumsq.Alt1<- list()
   sumsq.A23<- list()
   sumsq.Agt1<- list()
-  
-  # loop models over individuals of a species
+  # to loop models over individuals of a species
   for(i in 1:length(individuals)){
     individuals<-unique(the.data$individual)
     subset<- the.data[the.data$individual == individuals[i], ] 
-    
-    # state conditions
+    # now state conditions
     m0<-m0.start(subset) # start value for m0
     N<-length(subset$mass) 
     n<-length(individuals)
@@ -45,7 +42,7 @@ unif.growth.mod<-function(the.data){
       pp.exp.fix<-optim(par.optim.exp, sumsq.optim, gr=NULL, subset, pred.optim.Ae1, m0, T, control=list(maxit=100000), method="Brent", lower=0, upper=1)
       par.optim.exp1<-pp.exp.fix$par
       identical<- sum((par.optim.exp-par.optim.exp1)^2) == 0 
-      if(identical) break # put in threshold if not working
+      if(identical) break 
     }
     
     # 1b: optimise with m0 fit
@@ -183,7 +180,7 @@ unif.growth.mod<-function(the.data){
     
     ### 5: A>1 MODEL
     # 5a: m0 fixed
-    par.t.Agt1<- start.params.Agt1.from.exp(0.05, subset) # or 0.001?
+    par.t.Agt1<- start.params.Agt1.from.exp(0.05, subset) 
     par.optim.Agt1.fix<- unlist(par.t.Agt1)
     pp.Agt1.fix<- optim(par.optim.Agt1.fix, sumsq.optim, gr=NULL, subset, pred.optim.Agt1.nls, m0, T, control=list(maxit=100000))
     repeat{
@@ -221,8 +218,9 @@ unif.growth.mod<-function(the.data){
 }
 
 
-# the following is code for an 'all-in-one' function that runs all models by looping over
-# species 
+##### FUNCTION FOR LOOPING THE 5 MODELS OVER SEVERAL SPECIES ####
+### the following is code for an 'all-in-one' function to run all models for 
+# several species by looping over species 
 
 unif.growth.mod.spec<- function(the.data){
   species<-the.data$species
