@@ -1,10 +1,9 @@
-########################
-# profile likelihood code for calculating confidence intervals
+### profile likelihood code for calculating confidence intervals
 # for parameter A for the Generalised VBGF ###
 ########################
-## first load your parameter values from A<1 model
-#
-## parameters
+## load the parameter estimates
+
+#######################
 library(boot)
 sigmoid<- inv.logit
 inv.sigmoid<- logit
@@ -67,26 +66,26 @@ nll.prof<- function(A, the.data, pred.func, ml.params, return.pars=F){
 
 par.start<- c(par.ml[2:4]) # f, k, m0
 
+
 ######################
 
-# The following computes the profile likelihood for a set of parameter values around the optimal value
-# You don't need to do this - it's just an exercise to show what's going on
-A.vals<- seq(0, par.ml[1], length=100) 
-
-nll.vec<- c()
-for (A in A.vals){
-  nll.vec<- c(nll.vec, nll.prof(A, growthdata, pred.optim.Alt1.third.nls, par.ml))
-}
-plot((A.vals), nll.vec) 
-
-###
 # Now for some code to find the confidence interval, i.e. the range of values where the nll is within a particular chi-squared statistic of the
 # max lik values.
-
 nll.ml<- nll1(par.ml[1:3], growthdata, par.ml[4], pred.optim.Alt1.third.nls)
 
 nll.target<- nll.ml + 0.5*qchisq(0.95, 1) # the confidence limits are where the nll equals this value
 
+# Set a range of values for (transformed) A
+A.vals<- seq(par.ml[1], 0, length=1000)
+
+# Taken from the profile likelihood script.  Each time A is changed, the optimisation starts from the best fitting values form the previous value of A
+nll.vec<- c()
+par.start<- par.ml
+for (A in A.vals){
+  nll.temp<-  nll.prof(A, growthdata, pred.optim.Alt1.third.nls, par.start, return.pars=T)
+  nll.vec<- c(nll.vec, nll.temp$value)
+  par.start<- c(0, nll.temp$par)
+}
 # We will find values for A where (nll - nll.target) equals zero, using the standard "uniroot" function.
 # To do this, we need to find a pair of values of A that bracket the zero.
 # Let's use another wrapper to define a function that is zero at
@@ -153,6 +152,5 @@ plot(sigmoid(A.vals), nll.vec, xlab="A", ylab="neg log likelihood", t="l")
 abline(h=nll.target, col="green")
 abline(v=sigmoid(A.ci1), col="green")
 abline(v=sigmoid(A.ci2), col="green")
-########################################
-# END
-########################################
+
+#### END ####
