@@ -1,18 +1,17 @@
-######################
-# profile likelihood code for calculating confidence intervals
+### profile likelihood code for calculating confidence intervals
 # for parameter A from the Supra-Exponential model ###
 ######################
-## first load your parameter values from A<1 model
-#
 ## parameters
+# requires package 'boot'
 library(boot)
 sigmoid<- inv.logit
 inv.sigmoid<- logit
-A<-1/(sigmoid(params.Agt1[1])) # untransformed ## error in plogis(x)
-z<-sigmoid(params.Agt1[2]) # untransformed ## error in plogis(x)
+A<-1/(sigmoid(params.Agt1[1])) # untransformed 
+z<-sigmoid(params.Agt1[2]) # untransformed 
 s<-sigmoid(params.Agt1[3]) # untransformed
 m0<-params.Agt1[4]
 par.ml<-params.Agt1 # transformed parameters
+
 #####################
 # A wrapper so that optim can be used to fit the same models
 sumsq.optim<- function(par, the.data, predict.fun, m0=NULL, log=F){
@@ -67,16 +66,6 @@ nll.prof<- function(A, the.data, pred.func, ml.params, return.pars=F){
 par.start<- c(par.ml[2:4]) # f, k, m0
 
 #######################
-# The following computes the profile likelihood for a set of parameter values around the optimal value
-# You don't need to do this - it's just an exercise to show what's going on
-A.vals<- seq(0, 2*par.ml[1], length=100) 
-
-nll.vec<- c()
-for (A in A.vals){
-  nll.vec<- c(nll.vec, nll.prof(A, growthdata, pred.optim.Agt1.nls, par.ml))
-}
-plot((A.vals), nll.vec) 
-######################
 # Now for some code to find the confidence interval, i.e. the range of values where the nll is within a particular chi-squared statistic of the
 # maximum likelihood values.
 
@@ -151,6 +140,4 @@ abline(h=nll.target, col="green")
 abline(v=sigmoid(A.ci1), col="green")
 abline(v=sigmoid(A.ci2), col="green")
 
-########################################
-# END
-########################################
+#### END ####
