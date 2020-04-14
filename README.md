@@ -1,2 +1,3 @@
 # Growth-curve-fitting-
-R code for fitting von Bertalanffy based growth models to data
+R code for fitting von Bertalanffy based growth models to data as proposed by:
+Lee et al. (2020) A new framework for growth curve fitting based on the von Bertalanffy function. Scientific Reports (in press).
